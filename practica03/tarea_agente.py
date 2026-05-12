@@ -1,6 +1,6 @@
 import datetime
 
-def lista_tareas(lista_tareas,descripcion):
+def agregar_tareas(lista_tareas,descripcion):
     """
     agregar una tarea a la lista si cumle con los requisitos
     """
@@ -47,24 +47,24 @@ def listar_tareas(lista_tareas):
         return f"Tarea eliminada:{tarea_eliminada}"
     
     def main():
-    tareas= []
-    PREFIJO = "!"
+        tareas = []
+        PREFIJO = "!"
     
-    print("Bienvenido al gestor de tareas")
-    activa = True
-    while activa:
-        entrada = input(">>>").strip()
+        print("Bienvenido al gestor de tareas")
+        activa = True
+        while activa:
+            entrada = input(">>>").strip()
 
-        if not entrada.startswith(PREFIJO):
-            print("Error: Comando no reconocido")
-            continue
+            if not entrada.startswith(PREFIJO):
+                print("Error: Comando no reconocido")
+                continue
 
-        #Procesamiento de le entrada
-        cuerpo = entrada[len(PREFIJO):].split(maxsplit=1)
-        comando= cuerpo[0].lower()
-        argumento= cuerpo [1] if len(cuerpo)> 1 else ""
+            #Procesamiento de le entrada
+            cuerpo = entrada[len(PREFIJO):].split(maxsplit=1)
+            comando= cuerpo[0].lower()
+            argumento= cuerpo [1] if len(cuerpo)> 1 else ""
 
     #Seleccion de acción
-    if comando=="add":
-        resultado = agregar_tareas(tareas, argumento)
-        print
+        if comando=="add":
+            resultado = agregar_tareas(tareas, argumento)
+            print
