@@ -10,6 +10,8 @@ def mostrar_bienvenida():
     return (
         "📜 Bot de Gestión de Tareas (Modo Estructurado):\n"
         "📜 Primeros pasos Agente Discord UX:\n"
+        "📜 Esccriba !add <tarea> para agregar una tarea:"
+        "📜 Esccriba !list para listar las tareas:"
         "📜 Esccriba !buscar <termino> para buscar un termino:"
         "📜 Esccriba !Exit para salir del Agente:"
     )
