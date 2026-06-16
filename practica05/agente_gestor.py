@@ -68,7 +68,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    # Evitar que el bot se responda a sí mismo
+    #Evitar que el bot se responda a sí mismo
     if message.author == client.user:
         return
     
