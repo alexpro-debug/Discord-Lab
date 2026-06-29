@@ -4,12 +4,11 @@ import importlib
 import os
 import sys
 
-
 def load_tareas_module():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     if current_dir not in sys.path:
         sys.path.insert(0, current_dir)
-    return importlib.import_module("tareas_agente")
+    return importlib.import_module("tarea_agente")
 
 
 def get_functions(module):
