@@ -4,7 +4,7 @@ import os
 import re
 from dotenv import load_dotenv
 
-# Importamos las herramientas de nuestra arquitectura modular (Capa de Decisión)
+# Importamos las herramientas de nuestra arquitectura modular
 from tools.clasificador import clasificar_intencion
 from tools.memoria import registrar_interaccion, obtener_perfil, registrar_error
 from tools.toolkit import TOOLKIT
@@ -19,14 +19,12 @@ client = discord.Client(intents=intents)
 
 @client.event
 async def on_ready():
-    print(f'✅ Agente Cognitivo conectado exitosamente como {client.user}')
-    print('Esperando dudas de los alumnos en lenguaje natural...')
-    print('-' * 30)
+    print(f'[INFO] Agente Cognitivo inicializado y conectado como {client.user}')
+    print('[INFO] A la espera de instrucciones en lenguaje natural...')
+    print('-' * 40)
 
 @client.event
 async def on_message(message):
-    # 1. PERCEPCIÓN
-    # Evitamos que el bot se responda a sí mismo y cicle el universo
     if message.author == client.user:
         return
     
@@ -36,15 +34,14 @@ async def on_message(message):
     # 2. PENSAMIENTO (Clasificación NLP)
     intencion = clasificar_intencion(texto_usuario)
     
-    # Guardamos el tema en la memoria de estado del alumno
+    # Guardamos el tema en la memoria de estado
     registrar_interaccion(usuario_id, intencion)
     perfil = obtener_perfil(usuario_id)
 
-    print(f"[LOG] Usuario: {message.author.name} | Intención: {intencion} | Historial en memoria: {perfil['historial_temas']}")
+    print(f"[LOG] Usuario: {message.author.name} | Intención: {intencion} | Historial: {perfil['historial_temas']}")
 
-    # Si no entendió, responde con empatía
     if intencion == "desconocido":
-        respuesta = "🤖 **Agente Tutor:** Aún estoy aprendiendo. Intenta preguntarme sobre variables, tipos de datos, revisar un ciclo while, o cómo usar listas."
+        respuesta = "**[Agente Tutor]**\n```text\n[Aviso] -> Instrucción no reconocida. Intente consultar sobre variables, tipos de datos, ciclos while o listas.\n```"
         await message.channel.send(respuesta)
         return
 
@@ -52,35 +49,28 @@ async def on_message(message):
     herramienta = TOOLKIT[intencion]["funcion"]
     descripcion = TOOLKIT[intencion]["descripcion"]
 
-    # --- Preparamos los argumentos según lo que pida la herramienta ---
     if intencion == "dividir_seguro":
-        # Extraemos los números del texto del usuario usando expresiones regulares
         numeros = re.findall(r'\d+', texto_usuario)
         if len(numeros) >= 2:
-            resultado = herramienta(numeros[0], numeros[1]) # Le mandamos num1 y num2
+            resultado = herramienta(numeros[0], numeros[1])
         else:
-            resultado = "⚠️ Necesito dos números en tu frase para simular la división (ej. 'divide 10 entre 0')."
+            resultado = "[Aviso] -> Se requieren dos números en la instrucción para simular la división."
     else:
-        # Para las demás, les pasamos todo el texto y ellas solitas extraen lo que necesitan
         resultado = herramienta(texto_usuario)
 
-    # --- INTERVENCIÓN PEDAGÓGICA BASADA EN MEMORIA (El toque maestro) ---
-    # Si el bot atrapó un error grave (como un ciclo infinito o dividir por cero)
-    if "ALERTA" in resultado or "Boom" in resultado:
+    # --- INTERVENCIÓN PEDAGÓGICA BASADA EN MEMORIA ---
+    if "ALERTA" in resultado or "capturada" in resultado:
         errores_totales = registrar_error(usuario_id)
         
-        # Si el alumno se ha equivocado 2 veces o más, el bot interviene
         if errores_totales >= 2:
-            resultado += f"\n\n💡 **Nota del Tutor:** He notado en tu historial que te has equivocado {errores_totales} veces probando excepciones o ciclos. Recuerda repasar la teoría de Programación Estructurada con calma, ¡no te rindas!"
+            resultado += f"\n\n[Nota del Sistema Tutor] -> Se han registrado {errores_totales} errores críticos en su sesión actual. Se recomienda revisar la documentación de Programación Estructurada para evitar fallos lógicos."
 
-    # Enviamos la respuesta final al canal
-    respuesta_final = f"🤖 **Agente Tutor** (Te estoy dando {descripcion}):\n\n{resultado}"
+    # Enviamos la respuesta final al canal empaquetada en un bloque de código
+    respuesta_final = f"**[Módulo de ejecución: {descripcion.capitalize()}]**\n```text\n{resultado}\n```"
     await message.channel.send(respuesta_final)
 
-
-# --- ARRANQUE DEL BOT ---
 if __name__ == "__main__":
     if TOKEN:
         client.run(TOKEN)
     else:
-        print("🚨 ERROR FATAL: No encontré el DISCORD_TOKEN. Verifica tu archivo .env")
+        print("[ERROR FATAL] No se encontró el DISCORD_TOKEN en el archivo .env")
